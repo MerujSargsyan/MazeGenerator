@@ -64,10 +64,10 @@ def generate_maze(starting_pos):
             visited.append(neighbor)
             connect(cell, neighbor)
         else:
-            x,y = (visited.pop().x, visited.pop().y)
+            next = visited.pop()
+            x,y = (next.x, next.y)
+
     
-
-
 def connect(cell1, cell2):
     if cell1.x < cell2.x:
         cell1.walls['right'] = False
