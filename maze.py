@@ -40,11 +40,6 @@ for row in range(len(maze_array)):
     for col in range(len(maze_array[0])):
         maze_array[row][col] = Cell(col, row)
 
-print(len(maze_array))
-print(len(maze_array[0]))
-
-
-
 def start_maze_generation():
     start_idx = random.randint(0, size-1)
 
@@ -69,7 +64,7 @@ def generate_maze(starting_pos):
 
     
 def connect(cell1, cell2):
-    if cell1.x < cell2.x:
+    if cell1.x <= cell2.x:
         cell1.walls['right'] = False
         cell2.walls['left'] = False
     elif cell1.x > cell2.x:
