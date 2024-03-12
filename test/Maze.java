@@ -1,5 +1,6 @@
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Maze {
     ArrayList<ArrayList<Cell>> mazeArray;
@@ -69,12 +70,20 @@ public class Maze {
 
         ArrayList<Cell> visited = new ArrayList<>();
         Cell current = mazeArray.get(startingPoint[0]).get(startingPoint[1]);
-        while(visited.size() != mazeSize*mazeSize) {
+        Stack<Cell> stack = new Stack<>();
+        while(visited.size() < mazeSize*mazeSize) {
             visited.add(current);
-            int neighborIdx = random.nextInt(current.neighbors.size());
-            Cell neighbor = current.neighbors.get(neighborIdx);
-            current.makePathToNeighbor(neighbor);
-            current = neighbor;
+            if(current.neighbors.isEmpty()) {
+                current = stack.pop();
+            } else {
+                int neighborIdx = random.nextInt(current.neighbors.size());
+                Cell neighbor = current.neighbors.get(neighborIdx);
+                current.neighbors.remove(neighbor);
+                current.makePathToNeighbor(neighbor);
+                stack.push(current);
+                current = neighbor;
+            }
+            
         }
     }
 
@@ -86,7 +95,9 @@ public class Maze {
 
                 for(int j = 0; j < mazeSize; j++) {
                     Cell currentCell = mazeArray.get(i).get(j);
-                    currentCell.addNeighbor(mazeArray.get(i+1).get(j));
+                    Cell neighbor = mazeArray.get(i+1).get(j);
+                    currentCell.addNeighbor(neighbor);
+                    neighbor.addNeighbor(currentCell);
                 }
 
             }
@@ -94,7 +105,7 @@ public class Maze {
     }
 
     public void printMaze() {
-        String output = "";
+        String output = "\n";
         for(int i = 0; i < mazeArray.size(); i++) {
             output += "[";
             for(int j = 0; j < mazeSize; j++) {
