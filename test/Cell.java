@@ -7,6 +7,7 @@ public class Cell {
     ArrayList<Cell> neighbors; 
     boolean isStart;
     Hashtable<String, Boolean> walls;
+    boolean isVisited;
 
 
     public Cell(int row, int col) {
@@ -14,6 +15,7 @@ public class Cell {
         this.col = col;
         this.neighbors = new ArrayList<Cell>();
         isStart = false;
+        isVisited = false;
         walls = new Hashtable<>();
         walls.put("top", true);
         walls.put("right", true);
@@ -23,28 +25,30 @@ public class Cell {
     }
 
     public void addNeighbor(Cell neighbor) {
-        this.neighbors.add(neighbor);
+        if(!neighbors.contains(neighbor)) {
+            this.neighbors.add(neighbor);
+        }
     }
 
     public void makePathToNeighbor(Cell neighbor) {
         if(this.col > neighbor.col) {
-            walls.put("right", false);
-            neighbor.walls.put("left", false);
-            return;
-        }
-        if(this.col < neighbor.col) {
             walls.put("left", false);
             neighbor.walls.put("right", false);
             return;
         }
+        if(this.col < neighbor.col) {
+            walls.put("right", false);
+            neighbor.walls.put("left", false);
+            return;
+        }
         if(this.row > neighbor.row) {
-            walls.put("bottom", false);
-            neighbor.walls.put("top", false);
+            walls.put("top", false);
+            neighbor.walls.put("bottom", false);
             return;
         }
         if(this.row < neighbor.row) {
-            walls.put("top", false);
-            neighbor.walls.put("bottom", false);
+            walls.put("bottom", false);
+            neighbor.walls.put("top", false);
         }
     }
 
@@ -64,5 +68,11 @@ public class Cell {
         if(walls.get("right")) output += "|";
 
         return output;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        Cell cell = (Cell)o;
+        return cell.row == this.row && cell.col == this.col;
     }
 }

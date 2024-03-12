@@ -68,17 +68,21 @@ public class Maze {
 
         connectBottomRows();
 
-        ArrayList<Cell> visited = new ArrayList<>();
         Cell current = mazeArray.get(startingPoint[0]).get(startingPoint[1]);
         Stack<Cell> stack = new Stack<>();
-        while(visited.size() < mazeSize*mazeSize) {
-            visited.add(current);
-            if(current.neighbors.isEmpty()) {
+        int visited = 0;
+
+        stack.push(current);
+        while(!stack.isEmpty()) {
+            current.isVisited = true;
+            visited++;
+            Cell neighbor = getViableNeighbor(current);
+            if(neighbor == null) {
+                if(visited == mazeSize*mazeSize) {
+                    current.isStart = true;
+                }
                 current = stack.pop();
             } else {
-                int neighborIdx = random.nextInt(current.neighbors.size());
-                Cell neighbor = current.neighbors.get(neighborIdx);
-                current.neighbors.remove(neighbor);
                 current.makePathToNeighbor(neighbor);
                 stack.push(current);
                 current = neighbor;
@@ -87,11 +91,26 @@ public class Maze {
         }
     }
 
+    private Cell getViableNeighbor(Cell current) {
+        ArrayList<Cell> validNeighbors = new ArrayList<Cell>();
+        for(Cell neighbor : current.neighbors) {
+            if(!neighbor.isVisited) {
+                validNeighbors.add(neighbor);
+            }
+        }
+
+        if(!validNeighbors.isEmpty()) {
+            int neighborIdx = random.nextInt(validNeighbors.size());
+            return validNeighbors.get(neighborIdx);
+        }
+        return null;
+    }
+
     // connects rows as neighbors
     private void connectBottomRows() {
         for(int i = 0; i < mazeArray.size(); i++) {
 
-            if(i + 1 != mazeArray.size()) {
+            if(i + 1 < mazeArray.size()) {
 
                 for(int j = 0; j < mazeSize; j++) {
                     Cell currentCell = mazeArray.get(i).get(j);
