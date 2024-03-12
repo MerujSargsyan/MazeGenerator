@@ -1,86 +1,65 @@
 import sys
-import random
+import util
 
 if len(sys.argv) != 2:
     print("Please enter the size of the maze")
     sys.exit()
 
-size = int(sys.argv[1])
+mazeSize = int(sys.argv[1])
 
-class Cell:
-    def __init__(self,x,y):
-        self.x = x
-        self.y = y
-        self.walls = {'top': True, 'right': True, 'bottom': True,
-            'left': True}
-        self.visited = False
-        self.isStart = False
+mazeArray = [[None] * mazeSize for _ in range(mazeSize)]
+
+startingPoint = util.createStartingPoint(mazeSize)
+
+def generateMaze():
+    for row in range(mazeSize):
+        for col in range(mazeSize):
+            current = util.Cell(row, col)
+            if col - 1 >= 0:
+                current.addNeighbor(mazeArray[row][col-1])
+            if startingPoint["col"] == col and startingPoint["row"] == row:
+                current.isStarting = True
+            mazeArray[row][col] = current
     
-    def get_neighbor(self):
-        valid_neighbors = []
-        if(self.x+1 < size):
-            valid_neighbors.append(maze_array[self.y][self.x+1])
-        if(self.x-1 >= 0):
-            valid_neighbors.append(maze_array[self.y][self.x-1])
-        if(self.y-1 >= 0):
-            valid_neighbors.append(maze_array[self.y-1][self.x])
-        if(self.y+1 < size):
-            valid_neighbors.append(maze_array[self.y+1][self.x])
-        
-        for neighbor in valid_neighbors:
-            if neighbor.visited == False:
-                return neighbor
-        
-        return None
+    current = mazeArray[startingPoint["row"]][startingPoint["col"]]
+    # implemented array as stack
+    stack = []
+    visitedCount = 0
 
-
-maze_array = [[None] * size for _ in range(size)]
-
-for row in range(len(maze_array)):
-    for col in range(len(maze_array[0])):
-        maze_array[row][col] = Cell(col, row)
-
-def start_maze_generation():
-    start_idx = random.randint(0, size-1)
-
-    start_cell = maze_array[0][start_idx]
-    start_cell.isStart = True
-    generate_maze((start_cell.x, start_cell.y))
-
-visited = []
-def generate_maze(starting_pos):
-    x,y = starting_pos
-
-    while len(visited) < size*size:
-        cell = maze_array[x][y]
-        neighbor = cell.get_neighbor()
-        neighbor.visitied = True
-        if neighbor is not None:
-            visited.append(neighbor)
-            connect(cell, neighbor)
+    stack.append(current)
+    while len(stack) > 0:
+        current.isVisited = True
+        visitedCount += 1
+        neighbor = util.getViableNeighbor(current)
+        if neighbor is None:
+            # checks if every cell is visited
+            if visitedCount == mazeSize * mazeSize:
+                current.isFinal = True
+            current = stack.pop()
         else:
-            next = visited.pop()
-            x,y = (next.x, next.y)
+            current.addPathToNeighbor(neighbor)
+            stack.append(current)
+            current = neighbor
 
     
-def connect(cell1, cell2):
-    if cell1.x <= cell2.x:
-        cell1.walls['right'] = False
-        cell2.walls['left'] = False
-    elif cell1.x > cell2.x:
-        cell1.walls['left'] = False
-        cell2.walls['right'] = False
-    elif cell1.y > cell2.y:
-        cell1.walls['bottom'] = False
-        cell2.walls['top'] = False
-    elif cell1.y < cell2.y:
-        cell1.walls['top'] = False
-        cell2.walls['bottom'] = False
+def connectBottomNeighbors():
+    for row in range(mazeSize):
+        for col in range(mazeSize):
+            current = mazeArray[row][col]
+            
+            if row + 1 < mazeSize:
+                current.addNeighbor(mazeArray[row+1][col])
 
+def printMaze():
+    output = "\n"
+    for i in range(mazeSize):
+        output += "["
 
+        for j in range(mazeSize):
+            cell = mazeArray[i][j]
+            output += cell.toString() + ", "
+        output += "]\n"
+        print(output)
 
-    
-
-
-
-    
+generateMaze()
+printMaze()

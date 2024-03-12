@@ -4,23 +4,22 @@ import pygame
 square_size = 50
 
 pygame.init()
-screen = pygame.display.set_mode((square_size * maze.size + square_size, 
-    square_size * maze.size + square_size))
+screen = pygame.display.set_mode((square_size * maze.mazeSize, square_size * maze.mazeSize))
 running = True
 
-maze.start_maze_generation()
+maze.generateMaze()
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill("black")
 
     #render
-    for row in range(len(maze.maze_array)):
-        for col in range(len(maze.maze_array[0])):
-            cell = maze.maze_array[row][col]
+    screen.fill("black")
+    for row in range(maze.mazeSize):
+        for col in range(maze.mazeSize):
+            cell = maze.mazeArray[row][col]
             walls = cell.walls
             color = "white"
             if cell.isStart:
